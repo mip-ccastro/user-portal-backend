@@ -1,5 +1,6 @@
 import { envs } from "../core/config/env";
 import { HttpCode, X_ACCESS_TOKEN, X_ID_TOKEN, X_REFRESH_TOKEN } from "../core/constants";
+import { JsonWebTokenError } from "jsonwebtoken";
 import { Logger } from "../utils/helper";
 import { Request, Response } from "express";
 import { signInValidator } from "../utils/validators";
@@ -116,9 +117,48 @@ export default class AuthController {
         }
     }
 
-    public async signOut() {
+    public async signOut(req: Request, res: Response) {
 
-    }
+		const id_token = req.headers[X_ID_TOKEN] as string ?? null;
+		
+		try {
+			if (!id_token) {
+				res.status(HttpCode.UNAUTHORIZED).send({ message: "Unauthorized" });
+				return;
+			}
+
+			const { id } = await JwtServiceInstance.verify(id_token, 'jwt_token');
+
+			const auth = await authModel.getAuthByIdToken(id_token);
+
+			if (!auth) {
+				res.status(HttpCode.BAD_REQUEST).send({ message: "Session not found" });
+				return;
+			}
+
+			await authModel.removeAuth(id);
+
+			res.status(HttpCode.OK).send({ message: "Sign-out successful" });
+		} catch (error) {
+			logger.error('Error during sign-out:', error);
+
+			if(error instanceof JsonWebTokenError) {
+				if(error.message === 'jwt expired'){
+					const auth = await authModel.getAuthByIdToken(id_token);
+					if (auth) {
+						await authModel.removeAuth(auth.user.user_id);
+					}
+					res.status(HttpCode.OK).send({ message: "Sign-out successful" });					
+					return;
+				} else if(error.message === 'invalid token' || error.message === 'jwt malformed' || error.message === 'invalid signature') {
+					res.status(HttpCode.UNAUTHORIZED).send({ message: "Unauthorized" });
+					return;
+				}
+			}
+
+			throw error;
+		}
+	}
 
     public async newAccessToken(req: Request, res: Response) {
 		try {

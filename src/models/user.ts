@@ -90,6 +90,7 @@ export default class UserModel {
                 .leftJoinAndSelect('User.user_credentials', 'User_Credentials')
                 .andWhere('User.user_status != :status', { status: -1 })
                 .select(['User', 'User_Credentials.username'])
+                .orderBy('User.updated_at', 'DESC')
                 .getMany();
 
             return users;

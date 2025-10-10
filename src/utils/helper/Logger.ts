@@ -1,11 +1,16 @@
 import winston, { createLogger, format, transports } from "winston";
 import { envs } from "../../core/config/env";
 
-export default class Logger {
+interface ILogger {
+  info(message: string, meta?: any): void;
+  warn(message: string, meta?: any): void;
+  error(message: string, meta?: any): void;
+}
+
+export default class Logger implements ILogger {
   private logger: winston.Logger;
   private location?: string;
-  private node_env = envs.NODE_ENV;
-
+  private node_env = envs.NODE_ENV || 'development';
 
   constructor(location?: string) {
     this.location = location;

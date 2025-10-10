@@ -1,13 +1,13 @@
 import { Router } from "express";
+import { user_role } from "../core/constants/enum";
 import { UserController } from "../controller";
 import authMiddleware from "../middleware/jwt";
 import checkRole from "../middleware/checkrole";
-import { user_role } from "../core/constants/enum";
 
 const userRouter = Router();
 const userController = new UserController();
 
-userRouter.post('/user', userController.createUser);
+userRouter.post('/user', authMiddleware, checkRole([user_role.admin]), userController.createUser);
 
 userRouter.get('/users', authMiddleware, checkRole([user_role.admin]) ,userController.getAllUsers);
 userRouter.get('/user/:id', authMiddleware, userController.getUserById);

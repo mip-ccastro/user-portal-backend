@@ -9,3 +9,8 @@ export enum user_status {
     'Active' = 1,
     'Suspended' = 2
 }
+
+export enum template_type {
+    'email' = 'email',
+    'sms' = 'sms'
+}

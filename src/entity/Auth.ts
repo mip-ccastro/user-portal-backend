@@ -20,11 +20,9 @@ export class Auth extends BaseEntity {
     @JoinColumn({ name: 'user_id' })
     user: User;
 
-    @CreateDateColumn()
-    created_date: Date;
+    @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: false })
+    created_at: Date;
 
-    @UpdateDateColumn({
-        nullable: true,
-    })
-    updated_date: Date;
+    @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: false })
+    updated_at: Date;
 }

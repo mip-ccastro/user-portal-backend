@@ -6,6 +6,7 @@ type data = {
     template_name: string;
     content?: string
     recipients: string[]
+    form_id: string
 }
 
 type TResponse = {
@@ -41,6 +42,10 @@ const schema = Joi.object<data>({
     recipients: Joi.array()
         .items(Joi.string())
         .default([])
+        .optional(),
+    form_id: Joi.string()
+        .allow('')
+        .default('')
         .optional()
 }).messages({
     'object.unknown': 'You have used an invalid key ({#label})'

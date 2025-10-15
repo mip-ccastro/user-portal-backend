@@ -1,6 +1,7 @@
-import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, OneToMany, ManyToMany, JoinTable } from "typeorm";
+import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, OneToMany, ManyToMany, JoinTable, ManyToOne } from "typeorm";
 import { Recipient } from "./Recipient";
 import { template_type } from "../core/constants/enum";
+import { Form } from "./Form";
 
 @Entity()
 export class Template extends BaseEntity {
@@ -24,6 +25,10 @@ export class Template extends BaseEntity {
     @ManyToMany(() => Recipient, (recipient) => recipient.templates)
     @JoinTable()
     recipients: Recipient[]
+
+    @ManyToOne(() => Form, (form) => form.templates)
+    @JoinColumn({ name: 'form_id' })
+    form: Form;
 
     @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: false })
     created_at: Date;

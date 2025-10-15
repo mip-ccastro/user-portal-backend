@@ -2,6 +2,7 @@ import { Logger } from "../utils/helper";
 import { Template } from "../entity/Template";
 import dataSource from "../core/config/data-source";
 import { Recipient } from "../entity/Recipient";
+import { Form } from "../entity/Form";
 
 const logger = new Logger('TemplateModel');
 const templateRepository = dataSource.getRepository(Template);
@@ -23,7 +24,7 @@ export default class TemplateModel {
 
             return dataSource.transaction(async (transactionalEntityManager) => {
                 
-                const { recipients = [], ...rest } = params ?? {}
+                const { recipients = [], form_id, ...rest } = params ?? {}
 
                 const { raw } = await transactionalEntityManager.createQueryBuilder()
                     .update(Template)
@@ -35,6 +36,7 @@ export default class TemplateModel {
                 const template = await transactionalEntityManager.getRepository(Template)
                         .createQueryBuilder()
                         .leftJoinAndSelect('Template.recipients', 'recipients')
+                        .leftJoinAndSelect('Template.form', 'form')
                         .where('Template.id = :id', { id })
                         .getOne();
 
@@ -54,6 +56,26 @@ export default class TemplateModel {
                         .remove(template?.recipients);
                         
                 }
+
+                if(form_id !== '') {
+                    const _form = await transactionalEntityManager.getRepository(Form)
+                        .createQueryBuilder()
+                        .andWhere('Form.id = :id', { id: form_id })
+                        .getOne();
+
+                    await transactionalEntityManager.createQueryBuilder()
+                        .relation(Template, 'form')
+                        .of(raw[0].id)
+                        .set(_form);
+                } else {
+                    if(template && template.form) {
+                        await transactionalEntityManager.createQueryBuilder()
+                            .relation(Template, 'form')
+                            .of(raw[0].id)
+                            .remove(template.form);
+                    }
+                }
+                
 
                 return raw[0];
             })
@@ -81,8 +103,9 @@ export default class TemplateModel {
         try {
             const template = await templateRepository.createQueryBuilder('Template')
                 .leftJoinAndSelect('Template.recipients', 'recipients')
+                .leftJoinAndSelect('Template.form', 'form')
                 .where('Template.id = :id', { id })
-                .select(['Template', 'recipients.id'])
+                .select(['Template', 'recipients.id', 'form.id'])
                 .getOne();
 
             return template;

@@ -18,4 +18,9 @@ export const envs = {
     DB_HOST: get('DB_HOST').default('localhost').asString(),
     DB_PASSWORD: get('DB_PASSWORD').default('admin').asString(),
     DB_PORT: get('DB_PORT').default(5432).asInt(),
+
+    AZURE_EMAIL_MAILBOX: get('AZURE_EMAIL_MAILBOX').required().asString(),
+    AZURE_EMAIL_CLIENT_ID: get('AZURE_EMAIL_CLIENT_ID').required().asString(),
+    AZURE_EMAIL_CLIENT_SECRET: get('AZURE_EMAIL_CLIENT_SECRET').required().asString(),
+    AZURE_EMAIL_TENANT_ID: get('AZURE_EMAIL_TENANT_ID').required().asString(),
 }

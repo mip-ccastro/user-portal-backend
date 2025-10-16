@@ -9,8 +9,8 @@ const formController = new FormController();
 
 formRouter.post('/form', authMiddleware, checkRole([user_role.admin]), formController.createForm);
 
-formRouter.get('/forms', authMiddleware, checkRole([user_role.admin]), formController.getAllForms);
-formRouter.get('/form/:id', authMiddleware, checkRole([user_role.admin]), formController.getFormById);
+formRouter.get('/forms', authMiddleware, checkRole([user_role.admin, user_role.user]), formController.getAllForms);
+formRouter.get('/form/:id', authMiddleware, checkRole([user_role.admin, user_role.user]), formController.getFormById);
 
 formRouter.put('/form/:id', authMiddleware, checkRole([user_role.admin]) , formController.updateForm);
 

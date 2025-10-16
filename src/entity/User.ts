@@ -1,6 +1,7 @@
-import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from "typeorm";
+import { Entity, BaseEntity, Column, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn, OneToMany } from "typeorm";
 import { User_Credentials } from "./User_Credential";
 import { user_role } from "../core/constants/enum";
+import { Submission } from "./Submission";
 
 @Entity()
 export class User extends BaseEntity {
@@ -32,6 +33,9 @@ export class User extends BaseEntity {
 
     @OneToOne(() => User_Credentials, (user_credentials) => user_credentials.user , { nullable: false })
     user_credentials: User_Credentials
+
+    @OneToMany(() => Submission, (submission) => submission.user)
+    submissions: Submission[];
 
     @Column({ type: 'varchar', length: 100, nullable: true })
     updated_by: string;

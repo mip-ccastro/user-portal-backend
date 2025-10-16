@@ -50,6 +50,8 @@ export default class FormModel {
     public async getFormById(id: string): Promise<Form | null> {
         try {
             const form = await formRepository.createQueryBuilder('Form')
+                .leftJoinAndSelect('Form.templates', 'Templates')
+                .leftJoinAndSelect('Templates.recipients', 'Recipients')
                 .where('Form.id = :id', { id })
                 .getOne();
 

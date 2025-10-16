@@ -1,5 +1,6 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne } from "typeorm";
 import { Schema } from "../core/constants/types/form.types";
+import { Submission } from "./Submission";
 import { Template } from "./Template";
 
 @Entity()
@@ -14,10 +15,13 @@ export class Form extends BaseEntity {
     form_description: string;
 
     @Column({ type: 'jsonb', nullable: true, default: () => "'[]'" })
-    form_fields: Schema[];
+    form_fields: string;
 
     @OneToMany(() => Template, (template) => template.form)
     templates: Template[];
+
+    @OneToMany(() => Submission, (submission) => submission.form)
+    submissions: Submission[]
 
     @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', nullable: false })
     created_at: Date;

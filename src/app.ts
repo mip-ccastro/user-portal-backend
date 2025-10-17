@@ -1,11 +1,13 @@
-import initializeDB from './core/config/db-intialize';
 import { envs } from './core/config/env';
+import { Logger }from './utils/helper';
 import { Server } from './server';
 import AppDataSource from './core/config/data-source';
-import { Logger }from './utils/helper';
+import AzureEmailService from './utils/email/MicrosoftEmailService';
+import initializeDB from './core/config/db-intialize';
 
 
 const logger = new Logger('root');
+export let mailSender: AzureEmailService;
 
 const main = async (): Promise<void> => {
 	logger.info('Starting application...');
@@ -17,6 +19,8 @@ const main = async (): Promise<void> => {
 
 	AppDataSource.initialize().then(async () => {
 		void server.start();
+
+		mailSender = server.getEmailService();
 	})
 	.catch(error => logger.error('Error during Data Source initialization:', error));
 }

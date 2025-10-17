@@ -1,10 +1,11 @@
+import { CUSTOM_HEADERS, HttpCode, ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants';
+import { envs } from './core/config/env';
+import { Logger } from './utils/helper';
+import AzureEmailService from './utils/email/MicrosoftEmailService';
 import compression from 'compression';
+import cors from 'cors'
 import express, { NextFunction, Request, Response } from 'express';
 import rateLimit from 'express-rate-limit';
-import cors from 'cors'
-
-import { CUSTOM_HEADERS, HttpCode, ONE_HUNDRED, ONE_THOUSAND, SIXTY } from './core/constants';
-import { Logger } from './utils/helper';
 import routes from './routes';
 
 interface ServerOptions {
@@ -16,6 +17,7 @@ export class Server {
 	private readonly app = express();
 	private readonly port: number;
 	private logger: Logger;
+	private emailService: AzureEmailService;
 
 	constructor(options: ServerOptions) {
 		const { port } = options;
@@ -76,8 +78,19 @@ export class Server {
 			});
 		});
 
+		// INITIALIZE AZURE EMAIL SERVICE
+		this.emailService = new AzureEmailService(
+			envs.AZURE_EMAIL_CLIENT_ID,
+			envs.AZURE_EMAIL_CLIENT_SECRET,
+			envs.AZURE_EMAIL_TENANT_ID,
+		);
+
 		this.app.listen(this.port, () => {
 			this.logger.info(`Server is running on port ${this.port}`);
 		});
+	}
+
+	getEmailService(): AzureEmailService {
+		return this.emailService;
 	}
 }
